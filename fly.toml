@@ -1,0 +1,28 @@
+app = "u-starter"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PERSISTENT_DIR = "/data"
+  SSH_USERNAME = "dev"
+  ALLOW_ROOT_LOGIN = "false"
+  ALLOW_PASSWORD_AUTH = "false"
+  CF_USE_QUICK_TUNNEL = "false"
+
+[mounts]
+  source = "data"
+  destination = "/data"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
+
+[experimental]
+  auto_stop_machines = false
+  auto_start_machines = true
+
+[min_machines_running]
+  count = 1
