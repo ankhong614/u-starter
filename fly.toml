@@ -1,28 +1,28 @@
-app = "u-starter"
-primary_region = "sin"
+# fly.toml app configuration file generated for u-starter-patient-wildflower-9903 on 2026-03-26T08:29:58+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-[build]
-  dockerfile = "Dockerfile"
-
-[env]
-  PERSISTENT_DIR = "/data"
-  SSH_USERNAME = "dev"
-  ALLOW_ROOT_LOGIN = "false"
-  ALLOW_PASSWORD_AUTH = "false"
-  CF_USE_QUICK_TUNNEL = "false"
-
-[mounts]
-  source = "data"
-  destination = "/data"
-
-[[vm]]
-  memory = "1gb"
-  cpu_kind = "shared"
-  cpus = 1
+app = 'u-starter-patient-wildflower-9903'
+primary_region = 'sin'
 
 [experimental]
-  auto_stop_machines = false
-  auto_start_machines = true
 
-[min_machines_running]
-  count = 1
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  ALLOW_PASSWORD_AUTH = 'false'
+  ALLOW_ROOT_LOGIN = 'false'
+  CF_USE_QUICK_TUNNEL = 'false'
+  PERSISTENT_DIR = '/data'
+  SSH_USERNAME = 'dev'
+
+[[mounts]]
+  source = 'data'
+  destination = '/data'
+
+[[vm]]
+  memory = '1gb'
+  cpus = 1
+  memory_mb = 1024
