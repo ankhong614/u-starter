@@ -28,7 +28,7 @@ fail() {
 }
 
 require_ssh_auth() {
-    if[ -n "$SSH_PUBLIC_KEY" ] || [ -n "$SSH_AUTHORIZED_KEYS" ]; then
+    if [ -n "$SSH_PUBLIC_KEY" ] || [ -n "$SSH_AUTHORIZED_KEYS" ]; then
         return 0
     fi
 
@@ -40,7 +40,7 @@ require_ssh_auth() {
 }
 
 require_tunnel_config() {
-    if[ -n "$CF_TUNNEL_TOKEN" ]; then
+    if [ -n "$CF_TUNNEL_TOKEN" ]; then
         return 0
     fi
 
@@ -52,7 +52,7 @@ require_tunnel_config() {
 }
 
 require_user_password() {
-    if[ -n "$SSH_PASSWORD" ]; then
+    if [ -n "$SSH_PASSWORD" ]; then
         return 0
     fi
 
@@ -85,11 +85,11 @@ ensure_user() {
 
     if [ -n "$SSH_AUTHORIZED_KEYS" ]; then
         printf '%s\n' "$SSH_AUTHORIZED_KEYS" > "$user_home/.ssh/authorized_keys"
-    elif[ -n "$SSH_PUBLIC_KEY" ]; then
+    elif [ -n "$SSH_PUBLIC_KEY" ]; then
         printf '%s\n' "$SSH_PUBLIC_KEY" > "$user_home/.ssh/authorized_keys"
     fi
 
-    if[ -f "$user_home/.ssh/authorized_keys" ]; then
+    if [ -f "$user_home/.ssh/authorized_keys" ]; then
         chown "$SSH_USERNAME:$SSH_USERNAME" "$user_home/.ssh/authorized_keys"
         chmod 600 "$user_home/.ssh/authorized_keys"
     fi
@@ -147,7 +147,7 @@ print_summary() {
     echo "User: $SSH_USERNAME"
     echo "Persistent data: $PERSISTENT_DIR"
 
-    if[ -n "$CF_TUNNEL_HOSTNAME" ]; then
+    if [ -n "$CF_TUNNEL_HOSTNAME" ]; then
         echo "SSH hostname: $CF_TUNNEL_HOSTNAME"
         echo "SSH command: ssh -i ~/.ssh/your_key $SSH_USERNAME@$CF_TUNNEL_HOSTNAME -o ProxyCommand=\"cloudflared access ssh --hostname %h\" -o IdentitiesOnly=yes"
     elif bool_is_true "$CF_USE_QUICK_TUNNEL"; then
