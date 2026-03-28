@@ -4,15 +4,12 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        openssh-server sudo wget ca-certificates procps iputils-ping \
-        bash dash curl git zstd && \
+    openssh-server sudo ca-certificates curl && \
     mkdir -p /var/run/sshd /etc/ssh /data && \
-    ln -sf /usr/bin/dash /bin/sh && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && \
-    chmod +x cloudflared-linux-amd64 && \
-    mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+RUN curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared && \
+    chmod +x /usr/local/bin/cloudflared
 
 ENV PERSISTENT_DIR=/data
 ENV ALLOW_ROOT_LOGIN=false

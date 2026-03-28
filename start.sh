@@ -28,11 +28,11 @@ fail() {
 }
 
 require_ssh_auth() {
-    if [ -n "$SSH_PUBLIC_KEY" ] || [ -n "$SSH_AUTHORIZED_KEYS" ]; then
+    if[ -n "$SSH_PUBLIC_KEY" ] || [ -n "$SSH_AUTHORIZED_KEYS" ]; then
         return 0
     fi
 
-    if bool_is_true "$ALLOW_PASSWORD_AUTH" && [ -n "$SSH_PASSWORD" ]; then
+    if bool_is_true "$ALLOW_PASSWORD_AUTH" &&[ -n "$SSH_PASSWORD" ]; then
         return 0
     fi
 
@@ -40,7 +40,7 @@ require_ssh_auth() {
 }
 
 require_tunnel_config() {
-    if [ -n "$CF_TUNNEL_TOKEN" ]; then
+    if[ -n "$CF_TUNNEL_TOKEN" ]; then
         return 0
     fi
 
@@ -52,7 +52,7 @@ require_tunnel_config() {
 }
 
 require_user_password() {
-    if [ -n "$SSH_PASSWORD" ]; then
+    if[ -n "$SSH_PASSWORD" ]; then
         return 0
     fi
 
@@ -64,7 +64,7 @@ setup_persistent_storage() {
 }
 
 setup_host_keys() {
-    if compgen -G "$PERSISTENT_DIR/ssh/ssh_host_*_key" >/dev/null; then
+    if compgen -G "$PERSISTENT_DIR/ssh/ssh_host_*" > /dev/null; then
         cp "$PERSISTENT_DIR"/ssh/ssh_host_* /etc/ssh/
     else
         ssh-keygen -A
@@ -85,11 +85,11 @@ ensure_user() {
 
     if [ -n "$SSH_AUTHORIZED_KEYS" ]; then
         printf '%s\n' "$SSH_AUTHORIZED_KEYS" > "$user_home/.ssh/authorized_keys"
-    elif [ -n "$SSH_PUBLIC_KEY" ]; then
+    elif[ -n "$SSH_PUBLIC_KEY" ]; then
         printf '%s\n' "$SSH_PUBLIC_KEY" > "$user_home/.ssh/authorized_keys"
     fi
 
-    if [ -f "$user_home/.ssh/authorized_keys" ]; then
+    if[ -f "$user_home/.ssh/authorized_keys" ]; then
         chown "$SSH_USERNAME:$SSH_USERNAME" "$user_home/.ssh/authorized_keys"
         chmod 600 "$user_home/.ssh/authorized_keys"
     fi
@@ -97,7 +97,7 @@ ensure_user() {
     echo "$SSH_USERNAME:$SSH_PASSWORD" | chpasswd
 
     cat > "/etc/sudoers.d/$SSH_USERNAME" <<EOF
-$SSH_USERNAME ALL=(ALL:ALL) PASSWD: ALL
+$SSH_USERNAME ALL=(ALL:ALL) PASSWD:ALL
 EOF
     chmod 440 "/etc/sudoers.d/$SSH_USERNAME"
 }
@@ -147,7 +147,7 @@ print_summary() {
     echo "User: $SSH_USERNAME"
     echo "Persistent data: $PERSISTENT_DIR"
 
-    if [ -n "$CF_TUNNEL_HOSTNAME" ]; then
+    if[ -n "$CF_TUNNEL_HOSTNAME" ]; then
         echo "SSH hostname: $CF_TUNNEL_HOSTNAME"
         echo "SSH command: ssh -i ~/.ssh/your_key $SSH_USERNAME@$CF_TUNNEL_HOSTNAME -o ProxyCommand=\"cloudflared access ssh --hostname %h\" -o IdentitiesOnly=yes"
     elif bool_is_true "$CF_USE_QUICK_TUNNEL"; then
@@ -173,18 +173,6 @@ start_cloudflared() {
         cloudflared tunnel --url ssh://localhost:22 > "$LOG_FILE" 2>&1 &
     fi
     sleep 8
-
-    # ====================== OPENCLAW AUTO START ======================
-    if su - "$SSH_USERNAME" -c "export PATH=\"$PERSISTENT_DIR/home/$SSH_USERNAME/.npm-global/bin:\$PATH\"; command -v openclaw >/dev/null 2>&1"; then
-        echo "Starting OpenClaw gateway automatically..."
-        su - "$SSH_USERNAME" -c "
-            export PATH=\"$PERSISTENT_DIR/home/$SSH_USERNAME/.npm-global/bin:\$PATH\"
-            openclaw gateway --port 18789 --force
-        " > /data/openclaw.log 2>&1 &
-    else
-        echo "OpenClaw not found in PATH. Skipping automatic startup."
-    fi
-    # ================================================================
 
     print_summary
     exec tail -f "$LOG_FILE"
